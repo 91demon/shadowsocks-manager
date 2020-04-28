@@ -111,11 +111,13 @@ const createUser = async (email, password, from = '') => {
     if(newUserAccount.fromOrder) {
       const orderInfo = await knex('webgui_order').where({ id: newUserAccount.type }).then(s => s[0]);
       if(orderInfo) {
+        let password = Math.random().toString().substr(2,10);
+        if(password[0] === '0') { password = '1' + password.substr(1); }
         await account.addAccount(orderInfo.type || 5, {
           user: userId,
           orderId: orderInfo.id,
           port,
-          password: Math.random().toString().substr(2,10),
+          password,
           time: Date.now(),
           limit: orderInfo.cycle,
           flow: orderInfo.flow,
@@ -125,11 +127,13 @@ const createUser = async (email, password, from = '') => {
         });
       }
     } else {
+      let password = Math.random().toString().substr(2,10);
+      if(password[0] === '0') { password = '1' + password.substr(1); }
       await account.addAccount(newUserAccount.type || 5, {
         user: userId,
         orderId: 0,
         port,
-        password: Math.random().toString().substr(2,10),
+        password,
         time: Date.now(),
         limit: newUserAccount.limit || 8,
         flow: (newUserAccount.flow ? newUserAccount.flow : 350) * 1000000,
@@ -197,11 +201,13 @@ exports.signup = async (req, res) => {
       if(newUserAccount.fromOrder) {
         const orderInfo = await knex('webgui_order').where({ id: newUserAccount.type }).then(s => s[0]);
         if(orderInfo) {
+          let password = Math.random().toString().substr(2,10);
+          if(password[0] === '0') { password = '1' + password.substr(1); }
           await account.addAccount(orderInfo.type || 5, {
             user: userId,
             orderId: orderInfo.id,
             port,
-            password: Math.random().toString().substr(2,10),
+            password,
             time: Date.now(),
             limit: orderInfo.cycle,
             flow: orderInfo.flow,
@@ -211,11 +217,13 @@ exports.signup = async (req, res) => {
           });
         }
       } else {
+        let password = Math.random().toString().substr(2,10);
+        if(password[0] === '0') { password = '1' + password.substr(1); }
         await account.addAccount(newUserAccount.type || 5, {
           user: userId,
           orderId: 0,
           port,
-          password: Math.random().toString().substr(2,10),
+          password,
           time: Date.now(),
           limit: newUserAccount.limit || 8,
           flow: (newUserAccount.flow ? newUserAccount.flow : 350) * 1000000,
@@ -619,6 +627,7 @@ exports.status = async (req, res) => {
     const google_login_client_id = config.plugins.webgui.google_login_client_id || '';
     const facebook_login_client_id = config.plugins.webgui.facebook_login_client_id || '';
     const github_login_client_id = config.plugins.webgui.github_login_client_id || '';
+    const twitter_login_client_id = !!config.plugins.webgui.twitter_login_consumer_key;
     const crisp = (config.plugins.webgui_crisp && config.plugins.webgui_crisp.use) ? config.plugins.webgui_crisp.websiteId : '';
     let alipay;
     let paypal;
@@ -630,6 +639,7 @@ exports.status = async (req, res) => {
     let subscribe;
     let multiAccount;
     let simple;
+    let macAccount;
     if(status) {
       email = (await knex('user').select(['email']).where({ id }).then(s => s[0])).email;
       alipay = config.plugins.alipay && config.plugins.alipay.use;
@@ -655,6 +665,12 @@ exports.status = async (req, res) => {
         success[0].value = JSON.parse(success[0].value);
         return success[0].value;
       })).simple;
+      macAccount = (await knex('webguiSetting').select().where({
+        key: 'account',
+      }).then(success => {
+        success[0].value = JSON.parse(success[0].value);
+        return success[0].value;
+      })).macAccount;
     }
     if(status === 'normal') {
       knex('user').update({ lastLogin: Date.now() }).where({ id }).then();
@@ -681,9 +697,11 @@ exports.status = async (req, res) => {
       subscribe,
       multiAccount,
       simple,
+      macAccount,
       google_login_client_id,
       facebook_login_client_id,
       github_login_client_id,
+      twitter_login_client_id,
       crisp,
     });
   } catch(err) {

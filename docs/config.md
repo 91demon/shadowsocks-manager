@@ -2,6 +2,24 @@
 
 ## 配置首个节点
 
+### Docker 方式
+
+```
+docker run -idt \
+           --restart always \
+           --net=host \
+           -v ~/.ssmgr:/root/.ssmgr \
+           gyteng/ssmgr \
+           ssmgr \
+           -t s \
+           -s 127.0.0.1:6001 \
+           -m 0.0.0.0:6002 \
+           -p 123456 \
+           -r libev:aes-256-cfb
+```
+
+### 手工方式
+
 1. 创建配置文件
 
   在`~/.ssmgr`目录下创建配置文件，支持 yaml 和 json 两种格式，使用 yaml 格式请注意保证正确的缩进
@@ -32,10 +50,11 @@ db: 'db.sqlite'
 
 2. 运行 shadowsocks
 
-  两种版本的命令有一些差异，都要保证`--manager-address`的参数和上一步配置文件一致
+  不同版本的命令有一些差异，都要保证`--manager-address`的参数和上一步配置文件一致
 
   - libev `ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:6001`
   - python `ssserver -m aes-256-cfb -p 12345 -k abcedf --manager-address 127.0.0.1:6001`
+  - rust `ssmanager -m aes-256-cfb --manager-address 127.0.0.1:6001`
 
 
 3. 调用刚刚的配置文件运行 ssmgr
@@ -46,7 +65,7 @@ db: 'db.sqlite'
 
 ## 配置并运行Web界面
 
-  创建配置文件，将`1.1.1.1`替换成节点的实际IP地址
+  创建配置文件，将`1.1.1.1`替换成刚刚创建节点的实际IP地址
 
 ```yaml
 type: m
@@ -89,7 +108,6 @@ plugins:
     # twitter_login_consumer_secret: 'wYCtWdUSEfm8H3ES0r5rgHKeqGvYGiFDrGj4THiq3T6'
 
 db: 'webgui.sqlite'
-# 从 0.30 开始需要配置 redis
 redis:
   host: 'your.redis.host'
   port: 6379

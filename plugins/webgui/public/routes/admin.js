@@ -26,6 +26,24 @@ app.config(['$stateProvider', $stateProvider => {
       url: '/pay',
       controller: 'AdminPayController',
       templateUrl: `${ cdn }/public/views/admin/pay.html`,
+      params: {
+        myPayType: null,
+      },
+    })
+    .state('admin.recentSignup', {
+      url: '/recentSignup',
+      controller: 'AdminRecentSignupController',
+      templateUrl: `${ cdn }/public/views/admin/recentSignup.html`,
+    })
+    .state('admin.recentLogin', {
+      url: '/recentLogin',
+      controller: 'AdminRecentLoginController',
+      templateUrl: `${ cdn }/public/views/admin/recentLogin.html`,
+    })
+    .state('admin.topFlow', {
+      url: '/topFlow',
+      controller: 'AdminTopFlowController',
+      templateUrl: `${ cdn }/public/views/admin/topFlow.html`,
     })
     .state('admin.unfinished', {
       url: '/unfinished',

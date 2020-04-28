@@ -2,8 +2,11 @@ const app = angular.module('app');
 const window = require('window');
 const cdn = window.cdn || '';
 
-app.factory('subscribeDialog', [ '$mdDialog', '$http', ($mdDialog, $http) => {
-  const publicInfo = { linkType: 'shadowrocket', ip: '0', flow: '0' };
+app.factory('subscribeDialog', [ '$mdDialog', '$http', 'configManager', ($mdDialog, $http, configManager) => {
+  const publicInfo = { linkType: 'android', ip: '0', flow: '0' };
+  const config = configManager.getConfig();
+  publicInfo.userType = config.status === 'admin' ? 'admin' : 'user';
+  publicInfo.updateSubscribePage = false;
   const hide = () => {
     return $mdDialog.hide()
     .then(success => {
@@ -16,7 +19,7 @@ app.factory('subscribeDialog', [ '$mdDialog', '$http', ($mdDialog, $http) => {
   };
   publicInfo.hide = hide;
   const getSubscribe = () => {
-    return $http.get(`/api/user/account/${ publicInfo.accountId }/subscribe`);
+    return $http.get(`/api/${publicInfo.userType}/account/${ publicInfo.accountId }/subscribe`);
   };
   publicInfo.getSubscribe = getSubscribe;
   const updateSubscribe = () => {
@@ -38,9 +41,12 @@ app.factory('subscribeDialog', [ '$mdDialog', '$http', ($mdDialog, $http) => {
     controller: ['$scope', '$mdMedia', '$mdDialog', 'bind', 'configManager', '$mdToast', function($scope, $mdMedia, $mdDialog, bind, configManager, $mdToast) {
       $scope.publicInfo = bind;
       $scope.publicInfo.types = [
-        'shadowrocket', 'potatso', 'ssr', 'ssd', 'clash',
+        'android', 'shadowrocket', 'potatso', 'ssr', 'ssd', 'clash', 'mellow',
       ];
       const config = configManager.getConfig();
+      $scope.publicInfo.toUpdateSubscribePage = () => {
+        $scope.publicInfo.updateSubscribePage = true;
+      };
       $scope.changeLinkType = () => {
         $scope.publicInfo.subscribeLink = `${ config.site }/api/user/account/subscribe/${ $scope.publicInfo.token }?type=${ $scope.publicInfo.linkType }&ip=${ $scope.publicInfo.ip}&flow=${ $scope.publicInfo.flow}`;
       };
@@ -52,6 +58,7 @@ app.factory('subscribeDialog', [ '$mdDialog', '$http', ($mdDialog, $http) => {
         $scope.publicInfo.updateSubscribe().then(success => {
           $scope.publicInfo.token = success.data.subscribe;
           $scope.publicInfo.subscribeLink = `${ config.site }/api/user/account/subscribe/${ $scope.publicInfo.token }?type=${ $scope.publicInfo.linkType }&ip=${ $scope.publicInfo.ip}&flow=${ $scope.publicInfo.flow}`;
+          $scope.publicInfo.updateSubscribePage = false;
         });
       };
       $scope.toast = () => {

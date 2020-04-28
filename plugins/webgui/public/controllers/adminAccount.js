@@ -38,6 +38,7 @@ app.controller('AdminAccountController', ['$scope', '$state', '$mdMedia', '$http
         filter: $scope.accountFilter.filter,
       }).then(success => {
         // $scope.total = success.data.total;
+        if($state.current.name !== 'admin.account') { return; }
         $scope.setFabNumber(success.data.total);
         if(!search && $scope.menuSearch.text) { return; }
         if(search && search !== $scope.menuSearch.text) { return; }
@@ -120,8 +121,8 @@ app.controller('AdminAccountController', ['$scope', '$state', '$mdMedia', '$http
     };
   }
 ])
-.controller('AdminAccountPageController', ['$scope', '$state', '$stateParams', '$http', '$mdMedia', '$q', 'adminApi', '$timeout', '$interval', 'qrcodeDialog', 'ipDialog', '$mdBottomSheet', 'wireGuardConfigDialog', '$filter',
-  ($scope, $state, $stateParams, $http, $mdMedia, $q, adminApi, $timeout, $interval, qrcodeDialog, ipDialog, $mdBottomSheet, wireGuardConfigDialog, $filter) => {
+.controller('AdminAccountPageController', ['$scope', '$state', '$stateParams', '$http', '$mdMedia', '$q', 'adminApi', '$timeout', '$interval', 'qrcodeDialog', 'ipDialog', '$mdBottomSheet', 'wireGuardConfigDialog', '$filter', 'subscribeDialog',
+  ($scope, $state, $stateParams, $http, $mdMedia, $q, adminApi, $timeout, $interval, qrcodeDialog, ipDialog, $mdBottomSheet, wireGuardConfigDialog, $filter, subscribeDialog) => {
     $scope.setTitle('账号');
     $scope.setMenuButton('arrow_back', 'admin.account');
     $scope.accountId = +$stateParams.accountId;
@@ -150,10 +151,11 @@ app.controller('AdminAccountController', ['$scope', '$state', '$mdMedia', '$http
           }
         });
       }
-      $scope.defaultTab = $scope.servers.findIndex(e => e.id === $scope.account.idle) || 0;
+      $scope.defaultTab = $scope.servers.findIndex(e => e.id === $scope.account.idle);
+      if($scope.defaultTab < 0) { $scope.defaultTab = 0; }
       $scope.getServerPortData($scope.servers[$scope.defaultTab], $scope.accountId);
       $scope.isMultiServerFlow = !!$scope.account.multiServerFlow;
-    }).catch(() => {
+    }).catch((err) => {
       $state.go('admin.account');
     });
     let currentServerId;
@@ -425,6 +427,9 @@ app.controller('AdminAccountController', ['$scope', '$state', '$mdMedia', '$http
     $scope.isWG = server => server.type === 'WireGuard';
     $scope.showWireGuard = (server, account) => {
       wireGuardConfigDialog.show(server, account);
+    };
+    $scope.subscribe = accountId => {
+      subscribeDialog.show(accountId);
     };
   }
 ])

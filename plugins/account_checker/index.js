@@ -8,6 +8,7 @@ const cron = appRequire('init/cron');
 const flow = appRequire('plugins/flowSaver/flow');
 const manager = appRequire('services/manager');
 const config = appRequire('services/config').all();
+const webguiTag = appRequire('plugins/webgui_tag');
 let acConfig = {};
 if(config.plugins.account_checker && config.plugins.account_checker.use) {
   acConfig = config.plugins.account_checker;
@@ -316,6 +317,11 @@ const checkAccount = async (serverId, accountId) => {
       return;
     }
 
+    const tags = await webguiTag.getTags('server', serverId);
+    if(tags.includes('#_pause') || tags.includes('#pause')) {
+      return;
+    }
+
     // 检查当前端口是否存在
     const exists = await isPortExists(serverInfo, accountInfo);
 
@@ -420,6 +426,37 @@ cron.minute(async () => {
   .where('nextCheckTime', '<', Date.now() - 3 * 60 * 60 * 1000)
   .orderBy('nextCheckTime', 'asc');
 }, 'DeleteInvalidAccountFlow', 30);
+
+cron.minute(async () => {
+  const servers = await knex('server').select();
+  for(const server of servers) {
+    const tags = await webguiTag.getTags('server', server.id);
+    try {
+      const result = await manager.send({ command: 'version' }, {
+        host: server.host,
+        port: server.port + server.shift,
+        password: server.password,
+      });
+      if(result.isGFW && !tags.includes('#_hide') && tags.includes('#autohide')) {
+        await webguiTag.setTags('server', server.id, [...tags, '#_hide']);
+      } else if (tags.includes('#_hide')) {
+        await webguiTag.setTags('server', server.id, tags.filter(f => f !== '#_hide'));
+      }
+      if(result.isGFW && !tags.includes('#_pause') && tags.includes('#autopause')) {
+        await webguiTag.setTags('server', server.id, [...tags, '#_pause']);
+      } else if (tags.includes('#_pause')) {
+        await webguiTag.setTags('server', server.id, tags.filter(f => f !== '#_pause'));
+      }
+    } catch(err) {
+      if(!tags.includes('#_hide') && tags.includes('#autohide')) {
+        await webguiTag.setTags('server', server.id, [...tags, '#_hide']);
+      }
+      if(!tags.includes('#_pause') && tags.includes('#autopause')) {
+        await webguiTag.setTags('server', server.id, [...tags, '#_pause']);
+      }
+    }
+  }
+}, 'CheckServerStatus', 3);
 
 (async () => {
   const serverNumber = await knex('server').select(['id']).then(s => s.length);

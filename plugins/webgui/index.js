@@ -16,7 +16,7 @@ const sessionParser = session({
   rolling: true,
   resave: true,
   saveUninitialized: true,
-  cookie: { secure: false, httpOnly: true, maxAge: 7 * 24 * 3600 * 1000 },
+  cookie: { secure: false, httpOnly: true, maxAge: 7 * 24 * 3600 * 1000, sameSite: 'lax', },
   store,
 });
 const bodyParser = require('body-parser');
@@ -54,6 +54,7 @@ app.set('view engine', 'html');
 app.set('views', path.resolve('./plugins/webgui/views'));
 
 app.use('/libs', express.static(path.resolve('./plugins/webgui/libs')));
+app.use('/libs', express.static(path.resolve(os.homedir(), './.ssmgr/libs')));
 app.use('/public', express.static(path.resolve('./plugins/webgui/public')));
 app.use('/public/views/skin', express.static(path.resolve(os.homedir(), './.ssmgr/skin')));
 

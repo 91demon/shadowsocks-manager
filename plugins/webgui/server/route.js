@@ -196,6 +196,9 @@ app.post('/api/admin/order', isAdmin, isSuperAdmin, adminOrder.newOrder);
 app.put('/api/admin/order/:orderId(\\d+)', isAdmin, isSuperAdmin, adminOrder.editOrder);
 app.delete('/api/admin/order/:orderId(\\d+)', isAdmin, isSuperAdmin, adminOrder.deleteOrder);
 
+app.get('/api/admin/tag', isAdmin, isSuperAdmin, adminServer.getTags);
+app.put('/api/admin/tag', isAdmin, isSuperAdmin, adminServer.setTags);
+
 app.get('/api/user/notice', isUser, user.getNotice);
 app.get('/api/user/account', isUser, user.getAccount);
 app.get('/api/user/usage', isUser, user.getAccountUsage);
@@ -204,6 +207,7 @@ app.post('/api/user/account/mac', isUser, user.addMacAccount);
 app.get('/api/user/account/:accountId(\\d+)', isUser, user.getOneAccount);
 app.put('/api/user/account/:accountId(\\d+)/active', isUser, user.activeAccount);
 app.get('/api/user/account/:accountId(\\d+)/subscribe', isUser, user.getAccountSubscribe);
+app.get('/api/admin/account/:accountId(\\d+)/subscribe', isAdmin, user.getAdminAccountSubscribe);
 app.put('/api/user/account/:accountId(\\d+)/subscribe', isUser, user.updateAccountSubscribe);
 app.get('/api/user/server', isUser, user.getServers);
 app.get('/api/user/flow/:serverId(\\d+)/:accountId(\\d+)', isUser, user.getServerPortFlow);

@@ -1,4 +1,4 @@
-const ONLINE_CACHE_NAME = '2019-09-05 21:31:26 <%= serviceWorkerTime%>';
+const ONLINE_CACHE_NAME = '2020-04-21 14:43:22 <%= serviceWorkerTime%>';
 const isSWOpen = JSON.parse('<%= serviceWorker%>');
 
 const emptyCacheUrl = [];
@@ -84,13 +84,17 @@ const onlineCacheUrl = [
   '/public/views/admin/pickAccount.html',
   '/public/views/admin/pickTime.html',
   '/public/views/admin/previewNotice.html',
+  '/public/views/admin/recentLogin.html',
+  '/public/views/admin/recentSignup.html',
   '/public/views/admin/refCodeList.html',
   '/public/views/admin/refSetting.html',
   '/public/views/admin/refUserList.html',
   '/public/views/admin/server.html',
   '/public/views/admin/serverPage.html',
+  '/public/views/admin/setExpireTime.html',
   '/public/views/admin/settings.html',
   '/public/views/admin/telegramSetting.html',
+  '/public/views/admin/topFlow.html',
   '/public/views/admin/unfinished.html',
   '/public/views/admin/user.html',
   '/public/views/admin/userPage.html',
@@ -98,11 +102,13 @@ const onlineCacheUrl = [
 
   '/public/views/dialog/addAccount.html',
   '/public/views/dialog/addGiftCardBatch.html',
+  '/public/views/dialog/addMacAccount.html',
   '/public/views/dialog/alert.html',
   '/public/views/dialog/autopop.html',
   '/public/views/dialog/ban.html',
   '/public/views/dialog/changePassword.html',
   '/public/views/dialog/confirm.html',
+  '/public/views/dialog/editUserComment.html',
   '/public/views/dialog/email.html',
   '/public/views/dialog/ip.html',
   '/public/views/dialog/language.html',
@@ -114,6 +120,7 @@ const onlineCacheUrl = [
   '/public/views/dialog/setCurrentAccount.html',
   '/public/views/dialog/setEmail.html',
   '/public/views/dialog/setUserGroup.html',
+  '/public/views/dialog/showWireGuardConfig.html',
   '/public/views/dialog/subscribe.html',
 ];
 
